@@ -3,6 +3,7 @@ Application's and its environment's configuration.
 """
 
 import os
+from functools import lru_cache
 
 
 class Config:
@@ -25,3 +26,8 @@ class TestConfig(Config):
     TESTING = True
     DEBUG = False
     PRESERVE_CONTEXT_ON_EXCEPTION = False
+
+
+@lru_cache()
+def get_settings():
+    return Config()
