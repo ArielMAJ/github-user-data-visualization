@@ -1,0 +1,53 @@
+name: deploy
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "vue-front/**"
+      - ".github/workflows/auto_deploy.yml"
+env:
+  VUE_APP_BACKEND_ROOT_ENDPOINT: ${{ vars.VUE_APP_BACKEND_ROOT_ENDPOINT }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 19.x
+          cache: "yarn"
+          cache-dependency-path: ./vue-front/yarn.lock
+
+      - name: setup git auth
+        run: |
+          git config --global credential.helper store
+          echo "https://${{ secrets.ACCESS_TOKEN }}:x-oauth-basic@github.com" > ~/.git-credentials
+          git config --global user.name $user_name
+          git config --global user.email $user_email
+        env:
+          user_name: "ArielMAJ"
+          user_email: "ariel.maj@hotmail.comm"
+      - name: deploy to gh-pages
+        run: |
+          cd vue-front
+          yarn
+          mkdir tmp
+          cd tmp
+          git init
+          git remote add origin "https://github.com/${{ github.repository }}.git"
+          git fetch origin gh-pages
+          git checkout gh-pages
+          find . -maxdepth 1 -type f ! -name "CNAME" -exec rm -v {} \;
+          find . -maxdepth 1 -type d ! -name ".git" -exec rm -rv {} \;
+          cd ..
+          NODE_ENV=production yarn run build
+          mv dist/* tmp
+          cd tmp
+          if [[ ! $(git status --porcelain) ]]; then
+            echo "No changes to commit. Skipping deployment."
+            exit 0
+          fi
+          git add -A
+          git commit -m "🚀 Deploy id ${GITHUB_RUN_ID}"
+          git push origin gh-pages
