@@ -1,21 +1,19 @@
 <template>
   <div id="app">
-    <v-container>
-      <v-row no-gutters justify="space-around">
-        <v-col class="plotly-chart center-content">
-          <Loading v-if="plotInfo1.data === null" />
-          <PlotlyChart v-else :propData="plotInfo1" divId="plot1" />
-        </v-col>
-        <v-col class="plotly-chart center-content">
-          <LoadingHeart v-if="plotInfo2.data === null" />
-          <PlotlyChart v-else :propData="plotInfo2" divId="plot2" />
-        </v-col>
-        <v-col class="plotly-chart center-content">
-          <Loading v-if="plotInfo3.data === null" />
-          <PlotlyChart v-else :propData="plotInfo3" divId="plot3" />
-        </v-col>
-      </v-row>
-    </v-container>
+    <v-row no-gutters>
+      <v-col class="plotly-chart center-content">
+        <Loading v-if="plotInfo1.data === null" />
+        <PlotlyChart v-else :propData="plotInfo1" divId="plot1" />
+      </v-col>
+      <v-col class="plotly-chart center-content">
+        <LoadingHeart v-if="plotInfo2.data === null" />
+        <PlotlyChart v-else :propData="plotInfo2" divId="plot2" />
+      </v-col>
+      <v-col class="plotly-chart center-content">
+        <Loading v-if="plotInfo3.data === null" />
+        <PlotlyChart v-else :propData="plotInfo3" divId="plot3" />
+      </v-col>
+    </v-row>
   </div>
 </template>
 <script>
@@ -28,27 +26,43 @@ export default {
   components: {
     PlotlyChart,
     Loading,
-    LoadingHeart
+    LoadingHeart,
   },
   data: function () {
+    const plotData = {
+      layout: {
+        paper_bgcolor: "transparent",
+      },
+      config: {
+        responsive: true,
+      },
+    };
     return {
       plotInfo1: {
         data: null,
+        ...plotData,
       },
       plotInfo2: {
         data: null,
+        ...plotData,
       },
       plotInfo3: {
         data: null,
+        ...plotData,
       },
     };
   },
   async mounted() {
     try {
-        this.fetchData('a').then((data) => data.json()).then(json => this.plotInfo1.data = json.forks)
-        this.fetchData('b').then((data) => data.json()).then(json => this.plotInfo2.data = json.forks)
-        this.fetchData('c').then((data) => data.json()).then(json => this.plotInfo3.data = json.forks)
-
+      this.fetchData("a")
+        .then((data) => data.json())
+        .then((json) => (this.plotInfo1.data = json.forks));
+      this.fetchData("b")
+        .then((data) => data.json())
+        .then((json) => (this.plotInfo2.data = json.forks));
+      this.fetchData("c")
+        .then((data) => data.json())
+        .then((json) => (this.plotInfo3.data = json.forks));
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -56,7 +70,10 @@ export default {
   methods: {
     async fetchData(username) {
       try {
-        console.log("Fetching data...", process.env.VUE_APP_BACKEND_ROOT_ENDPOINT + `${username}/repos` );
+        console.log(
+          "Fetching data...",
+          process.env.VUE_APP_BACKEND_ROOT_ENDPOINT + `${username}/repos`
+        );
         return fetch(
           process.env.VUE_APP_BACKEND_ROOT_ENDPOINT + `${username}/repos`
         );
@@ -84,12 +101,10 @@ export default {
   min-height: 100vh;
   min-width: 100vw;
   max-width: 100vw;
-  position: absolute;
 }
 
 body {
   scroll-behavior: smooth;
-  overflow-y: hidden;
   overflow-x: hidden;
   min-width: 100vw;
   max-width: 100vw;
@@ -100,12 +115,18 @@ body {
   border: 1px solid #ccc;
   border-radius: 50px;
   background-color: transparent;
+  height: 350px;
+  min-width: 350px;
+  max-width: 45%;
 }
 
 .center-content {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 350px;
+}
+
+::-webkit-scrollbar {
+  display: none;
 }
 </style>

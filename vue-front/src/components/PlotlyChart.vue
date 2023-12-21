@@ -1,8 +1,12 @@
 <template>
-  <div ref="container" :id="divId" :style="{
-    height: height,
-    width: width,
-  }"></div>
+  <div
+    ref="container"
+    :id="divId"
+    :style="{
+      height: height,
+      width: width,
+    }"
+  ></div>
 </template>
 
 <script>
@@ -62,14 +66,20 @@ export default {
     },
 
     newPlot() {
-      Plotly.newPlot(this.divId, this.propData.data, {
-        paper_bgcolor: "transparent",
-      });
+      Plotly.newPlot(
+        this.divId,
+        this.propData.data,
+        this.propData.layout,
+        this.propData.config
+      );
     },
     update() {
-      Plotly.react(this.divId, this.propData.data, {
-        paper_bgcolor: "transparent",
-      });
+      Plotly.react(
+        this.divId,
+        this.propData.data,
+        this.propData.layout,
+        this.propData.config
+      );
     },
   },
 };
