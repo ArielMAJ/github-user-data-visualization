@@ -1,8 +1,12 @@
 <template>
-  <div ref="container" :id="divId" :style="{
-    height: height,
-    width: width,
-  }"></div>
+  <div
+    ref="container"
+    :id="divId"
+    :style="{
+      height: height,
+      width: width,
+    }"
+  ></div>
 </template>
 
 <script>
@@ -11,7 +15,7 @@ import Plotly from "plotly.js/dist/plotly";
 export default {
   name: "Plotly-Chart",
   props: {
-    propData: {
+    chartData: {
       type: Object,
       required: true,
     },
@@ -27,16 +31,27 @@ export default {
       type: String,
       default: "100%",
     },
+    layout: {
+      default: {
+        paper_bgcolor: "transparent",
+      },
+    },
+    config: {
+      default: {
+        responsive: true,
+      },
+    },
   },
   data: function () {
     return {};
   },
   mounted() {
+    console.log(this.divId, this.chartData)
     this.newPlot();
     this.bindEvents();
   },
   created() {
-    this.$watch("propData", this.update, { deep: true });
+    this.$watch("chartData", this.update, { deep: true });
   },
   beforeUnmount() {
     this.unbindEvents();
@@ -62,14 +77,20 @@ export default {
     },
 
     newPlot() {
-      Plotly.newPlot(this.divId, this.propData.data, {
-        paper_bgcolor: "transparent",
-      });
+      Plotly.newPlot(
+        this.divId,
+        this.chartData,
+        this.layout,
+        this.config
+      );
     },
     update() {
-      Plotly.react(this.divId, this.propData.data, {
-        paper_bgcolor: "transparent",
-      });
+      Plotly.react(
+        this.divId,
+        this.chartData,
+        this.layout,
+        this.config
+      );
     },
   },
 };

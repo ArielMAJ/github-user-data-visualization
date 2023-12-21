@@ -20,26 +20,26 @@ app.add_middleware(
 )
 
 
-@app.get("/{username}/repos")
-async def data(username: str):
+@app.get("/{username}/{information}")
+async def data(username: str, information: str):
+    await asyncio.sleep(random() * 5)
     gh_repositories = get_paginated_data(username)
+    return calc_repo_info_for_plotly(gh_repositories, information)
 
-    forks = [
+def calc_repo_info_for_plotly(gh_repositories, information: str):
+    return [
         {
             "values": [
-                fork_count := len(
-                    list(filter(lambda repo: repo["fork"], gh_repositories))
+                count := len(
+                    list(filter(lambda repo: repo.get(information, False), gh_repositories))
                 ),
-                len(gh_repositories) - fork_count,
+                len(gh_repositories) - count,
             ],
-            "labels": ["Forked Repositories", "Owned Repositories"],
+            "labels": [information.capitalize().replace("_", " "), "Otherwise"],
             "type": "pie",
             "hole": ".4",
         }
     ]
-    await asyncio.sleep(random() * 7)
-    return {"forks": forks}
-
 
 def get_paginated_data(username: str):
     def parse_data(data):
