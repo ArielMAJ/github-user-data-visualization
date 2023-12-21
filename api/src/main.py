@@ -1,3 +1,5 @@
+import asyncio
+from random import random
 import re
 
 import requests
@@ -35,6 +37,7 @@ async def data(username: str):
             "hole": ".4",
         }
     ]
+    await asyncio.sleep(3)
     return {"forks": forks}
 
 
