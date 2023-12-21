@@ -1,13 +1,8 @@
 <template>
-  <div
-    class="plotly-chart"
-    ref="container"
-    :id="divId"
-    :style="{
-      height: height,
-      width: width,
-    }"
-  ></div>
+  <div ref="container" :id="divId" :style="{
+    height: height,
+    width: width,
+  }"></div>
 </template>
 
 <script>
@@ -80,11 +75,4 @@ export default {
 };
 </script>
 
-<style scoped>
-.plotly-chart {
-  /* margin: 20px auto; */
-  border: 1px solid #ccc;
-  border-radius: 50px;
-  background-color: transparent;
-}
-</style>
+<style scoped></style>
