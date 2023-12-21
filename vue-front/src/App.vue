@@ -45,25 +45,20 @@ export default {
   },
   async mounted() {
     try {
-      const [data1, data2, data3] = await Promise.all([
-        this.fetchData(),
-        this.fetchData(),
-        this.fetchData(),
-      ]);
+        this.fetchData('a').then((data) => data.json()).then(json => this.plotInfo1.data = json.forks)
+        this.fetchData('b').then((data) => data.json()).then(json => this.plotInfo2.data = json.forks)
+        this.fetchData('c').then((data) => data.json()).then(json => this.plotInfo3.data = json.forks)
 
-      this.plotInfo1.data = (await data1.json()).forks;
-      this.plotInfo2.data = (await data2.json()).forks;
-      this.plotInfo3.data = (await data3.json()).forks;
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   },
   methods: {
-    async fetchData() {
+    async fetchData(username) {
       try {
-        console.log("Fetching data...");
+        console.log("Fetching data...", process.env.VUE_APP_BACKEND_ROOT_ENDPOINT + `${username}/repos` );
         return fetch(
-          process.env.VUE_APP_BACKEND_ROOT_ENDPOINT + "ArielMAJ/repos"
+          process.env.VUE_APP_BACKEND_ROOT_ENDPOINT + `${username}/repos`
         );
       } catch (error) {
         console.error("Error fetching data:", error);

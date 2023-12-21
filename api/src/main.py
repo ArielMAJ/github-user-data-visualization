@@ -37,7 +37,7 @@ async def data(username: str):
             "hole": ".4",
         }
     ]
-    await asyncio.sleep(3)
+    await asyncio.sleep(random() * 7)
     return {"forks": forks}
 
 
