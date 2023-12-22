@@ -46,7 +46,6 @@ export default {
     return {};
   },
   mounted() {
-    console.log(this.divId, this.chartData);
     this.newPlot();
     this.bindEvents();
   },

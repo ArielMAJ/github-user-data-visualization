@@ -21,11 +21,16 @@
       @click="pieChartModalOpen = !pieChartModalOpen"
     >Open Repository Visualization
     </v-btn> -->
-    <PieChartModal v-if="pieChartModalOpen" :username="this.username" />
+    <PieChartModal
+      v-if="pieChartModalOpen"
+      :username="this.username"
+      :reload-watcher="this.reloadCount"
+    />
   </div>
 </template>
 <script>
 import PieChartModal from "./modals/PieChartModal.vue";
+import _ from "lodash";
 
 export default {
   name: "app",
@@ -39,14 +44,23 @@ export default {
         required: (value) => !!value || "Field is required",
       },
       username: "",
+      reloadCount: 0,
     };
   },
   methods: {
     search() {
       if (this.username !== "") {
+        this.reloadCount++;
         this.pieChartModalOpen = true;
       }
     },
+  },
+  watch: {
+    username: _.debounce(function () {
+      if (this.username === "") {
+        this.pieChartModalOpen = false;
+      }
+    }, 2000),
   },
 };
 </script>
