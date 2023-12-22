@@ -1,6 +1,6 @@
 import asyncio
-from random import random
 import re
+from random import random
 
 import requests
 import uvicorn
@@ -26,12 +26,17 @@ async def data(username: str, information: str):
     gh_repositories = get_paginated_data(username)
     return calc_repo_info_for_plotly(gh_repositories, information)
 
+
 def calc_repo_info_for_plotly(gh_repositories, information: str):
     return [
         {
             "values": [
                 count := len(
-                    list(filter(lambda repo: repo.get(information, False), gh_repositories))
+                    list(
+                        filter(
+                            lambda repo: repo.get(information, False), gh_repositories
+                        )
+                    )
                 ),
                 len(gh_repositories) - count,
             ],
@@ -40,6 +45,7 @@ def calc_repo_info_for_plotly(gh_repositories, information: str):
             "hole": ".4",
         }
     ]
+
 
 def get_paginated_data(username: str):
     def parse_data(data):

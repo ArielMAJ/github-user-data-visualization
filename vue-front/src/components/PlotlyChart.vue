@@ -46,7 +46,7 @@ export default {
     return {};
   },
   mounted() {
-    console.log(this.divId, this.chartData)
+    console.log(this.divId, this.chartData);
     this.newPlot();
     this.bindEvents();
   },
@@ -77,20 +77,10 @@ export default {
     },
 
     newPlot() {
-      Plotly.newPlot(
-        this.divId,
-        this.chartData,
-        this.layout,
-        this.config
-      );
+      Plotly.newPlot(this.divId, this.chartData, this.layout, this.config);
     },
     update() {
-      Plotly.react(
-        this.divId,
-        this.chartData,
-        this.layout,
-        this.config
-      );
+      Plotly.react(this.divId, this.chartData, this.layout, this.config);
     },
   },
 };
