@@ -32,6 +32,10 @@ export default {
       type: String,
       required: true,
     },
+    reloadWatcher: {
+      type: Number,
+      required: true,
+    },
   },
   data: function () {
     return {
@@ -53,27 +57,30 @@ export default {
     };
   },
   async mounted() {
-    this.plotItems.forEach((item) => {
-      this.fetchData(this.username, item);
-    });
+    this.load();
   },
   methods: {
+    load() {
+      this.plotItems.forEach((item) => {
+        item.chartData = null;
+        this.fetchData(this.username, item);
+      });
+    },
     async fetchData(username, item) {
       try {
-        console.log(
-          "Fetching data...",
-          process.env.VUE_APP_BACKEND_ROOT_ENDPOINT +
-            `${username}/${item.information}`
-        );
         const resp = await fetch(
           process.env.VUE_APP_BACKEND_ROOT_ENDPOINT +
             `${username}/${item.information}`
         );
         item.chartData = await resp.json();
-        console.log(item);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
+    },
+  },
+  watch: {
+    reloadWatcher() {
+      this.load();
     },
   },
 };
