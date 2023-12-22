@@ -72,10 +72,8 @@ def get_paginated_data(username: str):
                 "X-GitHub-Api-Version": "2022-11-28",
             },
         )
-        logger.debug(get_settings().PRIVATE_KEY_PATH)
-        logger.debug(response)
-        logger.debug(response.json())
-        response.raise_for_status()
+        logger.debug(f"GitHub response: {response}")
+        # response.raise_for_status()
         data.extend(parse_data(response.json()))
 
         link_header = response.headers.get("link", "")
