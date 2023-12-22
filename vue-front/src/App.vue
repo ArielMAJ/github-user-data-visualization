@@ -1,6 +1,6 @@
 <template>
-  <div id="app">
-    <v-row no-gutters>
+  <div class="app justify-center">
+    <v-row no-gutters class="justify-center">
       <v-col
         v-bind:key="item"
         v-for="item in plotItems"
@@ -81,7 +81,7 @@ export default {
   padding: 0;
 }
 
-#app {
+.app {
   font-family: "Avenir", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -118,6 +118,10 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: space-around;
+}
+
+.justify-center {
+  justify-content: center;
 }
 
 ::-webkit-scrollbar {
