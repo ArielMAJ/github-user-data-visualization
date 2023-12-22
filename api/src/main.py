@@ -43,6 +43,7 @@ def calc_repo_info_for_plotly(gh_repositories, information: str):
             "labels": [information.capitalize().replace("_", " "), "Otherwise"],
             "type": "pie",
             "hole": ".4",
+            "marker": {"colors": ["rgb(255, 127, 14)", "rgb(31, 119, 180)"]},
         }
     ]
 
