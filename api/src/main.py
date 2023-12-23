@@ -22,8 +22,7 @@ app.add_middleware(
 
 @app.get("/{username}/{information}")
 async def data(username: str, information: str):
-    await asyncio.sleep(random() * 5)
-    gh_repositories = get_paginated_data(username)
+    gh_repositories = await get_paginated_data(username)
     return calc_repo_info_for_plotly(gh_repositories, information)
 
 
@@ -48,7 +47,7 @@ def calc_repo_info_for_plotly(gh_repositories, information: str):
     ]
 
 
-def get_paginated_data(username: str):
+async def get_paginated_data(username: str):
     def parse_data(data):
         if data is None:
             return []
@@ -56,6 +55,7 @@ def get_paginated_data(username: str):
 
     if get_settings().ENVIRONMENT == "DEV":
         logger.debug("DEV MODE")
+        await asyncio.sleep(random() * 5)
         return GH_REPOSITORIES
 
     url = f"https://api.github.com/users/{username}/repos"
