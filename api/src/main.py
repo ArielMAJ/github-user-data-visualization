@@ -6,6 +6,9 @@ import requests
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi_cache import FastAPICache
+from fastapi_cache.backends.inmemory import InMemoryBackend
+from fastapi_cache.decorator import cache
 from loguru import logger
 from src.config import get_settings
 from src.constants import GH_REPOSITORIES, USER_DATA
@@ -18,6 +21,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+FastAPICache.init(InMemoryBackend())
 
 
 @app.get("/{username}")
@@ -67,6 +71,7 @@ def calc_repo_info_for_plotly(gh_repositories, information: str):
     ]
 
 
+@cache(expire=60 * 60 * 24)
 async def get_paginated_repository_data(username: str):
     def parse_data(data):
         if data is None:
