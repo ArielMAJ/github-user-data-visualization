@@ -18,28 +18,33 @@
     <!-- <v-btn
       class="white--text"
       color="primary"
-      @click="pieChartModalOpen = !pieChartModalOpen"
+      @click="cardOpen = !cardOpen"
     >Open Repository Visualization
     </v-btn> -->
-    <PieChartModal
-      v-if="pieChartModalOpen"
+    <!-- <PieChartModal
+      v-if="cardOpen"
       :username="this.username"
       :reload-watcher="this.reloadCount"
+    /> -->
+    <UserCard
+      :username="this.username"
+      :reload-watcher="this.reloadCount"
+      v-if="cardOpen"
     />
   </div>
 </template>
 <script>
-import PieChartModal from "./modals/PieChartModal.vue";
+import UserCard from "./components/UserCard.vue";
 import _ from "lodash";
 
 export default {
   name: "app",
   components: {
-    PieChartModal,
+    UserCard,
   },
   data: function () {
     return {
-      pieChartModalOpen: false,
+      cardOpen: false,
       rules: {
         required: (value) => !!value || "Field is required",
       },
@@ -51,14 +56,14 @@ export default {
     search() {
       if (this.username !== "") {
         this.reloadCount++;
-        this.pieChartModalOpen = true;
+        this.cardOpen = true;
       }
     },
   },
   watch: {
     username: _.debounce(function () {
       if (this.username === "" || this.username === null) {
-        this.pieChartModalOpen = false;
+        this.cardOpen = false;
       }
     }, 2000),
   },
@@ -66,11 +71,6 @@ export default {
 </script>
 
 <style>
-* {
-  margin: 0;
-  padding: 0;
-}
-
 .app {
   font-family: "Avenir", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -90,6 +90,9 @@ body {
   overflow-x: hidden;
   min-width: 100vw;
   max-width: 100vw;
+
+  margin: 0;
+  padding: 0;
 }
 
 .justify-center {

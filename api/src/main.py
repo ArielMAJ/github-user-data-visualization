@@ -8,7 +8,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from loguru import logger
 from src.config import get_settings
-from src.constants import GH_REPOSITORIES
+from src.constants import GH_REPOSITORIES, USER_DATA
 
 app = FastAPI()
 app.add_middleware(
@@ -20,9 +20,29 @@ app.add_middleware(
 )
 
 
-@app.get("/{username}/{information}")
-async def data(username: str, information: str):
-    gh_repositories = await get_paginated_data(username)
+@app.get("/{username}")
+async def user_data(username: str):
+    if get_settings().ENVIRONMENT == "DEV":
+        logger.debug("DEV MODE")
+        await asyncio.sleep(random() * 5)
+        return USER_DATA
+    return requests.get(
+        f"https://api.github.com/users/{username}",
+        headers={
+            "Accept": "application/vnd.github+json",
+            "X-GitHub-Api-Version": "2022-11-28",
+        },
+    ).json()
+
+
+@app.get("/{username}/repos/{amount}")
+async def repository_data(username: str, amount: int):
+    return (await get_paginated_repository_data(username))[:amount]
+
+
+@app.get("/{username}/repos/plot/{information}")
+async def repository_plot_data(username: str, information: str):
+    gh_repositories = await get_paginated_repository_data(username)
     return calc_repo_info_for_plotly(gh_repositories, information)
 
 
@@ -47,7 +67,7 @@ def calc_repo_info_for_plotly(gh_repositories, information: str):
     ]
 
 
-async def get_paginated_data(username: str):
+async def get_paginated_repository_data(username: str):
     def parse_data(data):
         if data is None:
             return []
@@ -58,7 +78,7 @@ async def get_paginated_data(username: str):
         await asyncio.sleep(random() * 5)
         return GH_REPOSITORIES
 
-    url = f"https://api.github.com/users/{username}/repos"
+    url = f"https://api.github.com/users/{username}/repos?sort=updated"
     next_pattern = re.compile(r'<([^>]+)>; rel="next"')
     pages_remaining = True
     data = []
