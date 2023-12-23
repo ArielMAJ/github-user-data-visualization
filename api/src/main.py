@@ -25,6 +25,7 @@ FastAPICache.init(InMemoryBackend())
 
 
 @app.get("/{username}")
+@cache(expire=60 * 60 * 24)
 async def user_data(username: str):
     if get_settings().ENVIRONMENT == "DEV":
         logger.debug("DEV MODE")
