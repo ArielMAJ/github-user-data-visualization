@@ -51,7 +51,6 @@ export default {
         { information: "has_projects", chartData: null },
         { information: "has_wiki", chartData: null },
         { information: "is_template", chartData: null },
-        { information: "private", chartData: null },
         { information: "web_commit_signoff_required", chartData: null },
       ],
     };

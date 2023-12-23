@@ -57,7 +57,7 @@ export default {
   },
   watch: {
     username: _.debounce(function () {
-      if (this.username === "") {
+      if (this.username === "" || this.username === null) {
         this.pieChartModalOpen = false;
       }
     }, 2000),
