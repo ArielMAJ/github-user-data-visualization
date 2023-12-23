@@ -69,7 +69,7 @@ export default {
       try {
         const resp = await fetch(
           process.env.VUE_APP_BACKEND_ROOT_ENDPOINT +
-            `${username}/${item.information}`
+            `${username}/repos/plot/${item.information}`
         );
         item.chartData = await resp.json();
       } catch (error) {
