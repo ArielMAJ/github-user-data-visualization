@@ -17,6 +17,7 @@ class Config:
     PORT = int(os.getenv("APPLICATION_PORT", "3000"))
 
     APPLICATION_ROOT = os.getenv("APPLICATION_ROOT", "")
+    GITHUB_TOKEN = os.getenv("GITHUB_TOKEN", "")
 
 
 class TestConfig(Config):

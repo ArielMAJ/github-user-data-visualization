@@ -11,7 +11,8 @@ from fastapi_cache.backends.inmemory import InMemoryBackend
 from fastapi_cache.decorator import cache
 from loguru import logger
 from src.config import get_settings
-from src.constants import GH_REPOSITORIES, USER_DATA
+from src.constants import GITHUB_API_HEADERS
+from src.mocks import GH_REPOSITORIES, USER_DATA
 
 app = FastAPI()
 app.add_middleware(
@@ -24,7 +25,7 @@ app.add_middleware(
 FastAPICache.init(InMemoryBackend())
 
 
-@app.get("/{username}")
+@app.get("/users/{username}")
 @cache(expire=60 * 60 * 24)
 async def user_data(username: str):
     if get_settings().ENVIRONMENT == "DEV":
@@ -33,10 +34,7 @@ async def user_data(username: str):
         return USER_DATA
     return requests.get(
         f"https://api.github.com/users/{username}",
-        headers={
-            "Accept": "application/vnd.github+json",
-            "X-GitHub-Api-Version": "2022-11-28",
-        },
+        headers=GITHUB_API_HEADERS,
     ).json()
 
 
@@ -93,10 +91,7 @@ async def get_paginated_repository_data(username: str):
         response = requests.get(
             url,
             params={"per_page": 25},
-            headers={
-                "Accept": "application/vnd.github+json",
-                "X-GitHub-Api-Version": "2022-11-28",
-            },
+            headers=GITHUB_API_HEADERS,
         )
         logger.debug(f"GitHub response: {response}")
         # response.raise_for_status()
@@ -110,6 +105,14 @@ async def get_paginated_repository_data(username: str):
             logger.debug(link_header)
             url = next_pattern.search(link_header).group(1)
     return data
+
+
+@app.get("/rate_limit")
+async def rate_limit():
+    return requests.get(
+        "https://api.github.com/rate_limit",
+        headers=GITHUB_API_HEADERS,
+    ).json()
 
 
 if __name__ == "__main__":
