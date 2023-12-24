@@ -8,24 +8,15 @@
         hint="Write a GitHub username and press enter to visualize their account information"
         placeholder="ArielMAJ"
         clearable
+        clear-icon="mdi-close-circle"
         type="text"
         variant="solo-filled"
         :rules="[rules.required]"
         @keyup.enter="search"
+        @click:clear="cardOpen = false"
       >
       </v-text-field>
     </v-responsive>
-    <!-- <v-btn
-      class="white--text"
-      color="primary"
-      @click="cardOpen = !cardOpen"
-    >Open Repository Visualization
-    </v-btn> -->
-    <!-- <PieChartModal
-      v-if="cardOpen"
-      :username="this.username"
-      :reload-watcher="this.reloadCount"
-    /> -->
     <UserCard
       :username="this.username"
       :reload-watcher="this.reloadCount"
@@ -62,10 +53,10 @@ export default {
   },
   watch: {
     username: _.debounce(function () {
-      if (this.username === "" || this.username === null) {
-        this.cardOpen = false;
+      if (this.username !== "" && this.username !== null) {
+        this.search();
       }
-    }, 2000),
+    }, 1500),
   },
 };
 </script>
@@ -76,7 +67,6 @@ export default {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: rgb(4, 162, 4);
   background-color: black;
   min-height: 100vh;
   min-width: 100vw;
