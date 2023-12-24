@@ -153,6 +153,7 @@ export default {
             this.userData = {
               notFound: true,
             };
+            return;
           }
 
           this.exampleUsernames.add(this.username.toLowerCase());
@@ -184,7 +185,7 @@ export default {
     async fetchUserData(username) {
       try {
         return await fetch(
-          process.env.VUE_APP_BACKEND_ROOT_ENDPOINT + `${username}`
+          process.env.VUE_APP_BACKEND_ROOT_ENDPOINT + `users/${username}`
         );
       } catch (error) {
         console.error("Error fetching data:", error);
