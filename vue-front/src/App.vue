@@ -5,14 +5,16 @@
       <v-text-field
         v-model="username"
         label="Search for a GitHub username"
-        hint="Write a GitHub username and press enter to visualize their account information"
+        hint="Write a GitHub username to visualize their account information"
         placeholder="ArielMAJ"
         clearable
         clear-icon="mdi-close-circle"
         type="text"
         variant="solo-filled"
-        :rules="[rules.required]"
-        @keyup.enter="search"
+        @keyup.enter="
+          pressedEnter = true;
+          search();
+        "
         @click:clear="cardOpen = false"
       >
       </v-text-field>
@@ -20,8 +22,25 @@
     <UserCard
       :username="this.username"
       :reload-watcher="this.reloadCount"
+      :exampleUsernames="this.exampleUsernames"
       v-if="cardOpen"
     />
+    <v-responsive v-else max-width="1000" class="mx-auto">
+      <h3 class="text-center">Or choose one of the following</h3>
+      <v-chip-group class="justify-center">
+        <v-chip
+          v-for="exampleUsername in exampleUsernames"
+          :key="exampleUsername"
+          @click="
+            clickedFastSearch = true;
+            username = exampleUsername;
+            search();
+          "
+        >
+          {{ exampleUsername }}
+        </v-chip>
+      </v-chip-group>
+    </v-responsive>
   </div>
 </template>
 <script>
@@ -36,26 +55,47 @@ export default {
   data: function () {
     return {
       cardOpen: false,
-      rules: {
-        required: (value) => !!value || "Field is required",
-      },
       username: "",
       reloadCount: 0,
+      exampleUsernames: new Set([
+        "arielmaj",
+        "tauanesales",
+        "torvalds",
+        "octocat",
+        "defunkt",
+        "wouerner",
+        "mojombo",
+        "cs50",
+      ]),
+      clickedFastSearch: false,
+      pressedEnter: false,
     };
   },
   methods: {
     search() {
-      if (this.username !== "") {
-        this.reloadCount++;
-        this.cardOpen = true;
+      if (this.username === "" || this.username === null) {
+        this.cardOpen = false;
+        return;
       }
+      this.reloadCount++;
+      this.cardOpen = true;
     },
   },
   watch: {
     username: _.debounce(function () {
-      if (this.username !== "" && this.username !== null) {
-        this.search();
+      if (this.username === "" || this.username === null) {
+        this.cardOpen = false;
+        return;
       }
+      if (this.clickedFastSearch) {
+        this.clickedFastSearch = false;
+        return;
+      }
+      if (this.pressedEnter) {
+        this.pressedEnter = false;
+        return;
+      }
+      this.search();
     }, 1500),
   },
 };
@@ -86,6 +126,12 @@ body {
 }
 
 .justify-center {
+  justify-content: center;
+}
+
+.flex-row {
+  display: flex;
+  flex-direction: row;
   justify-content: center;
 }
 
