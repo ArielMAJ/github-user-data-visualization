@@ -1,63 +1,101 @@
 <template>
   <v-responsive>
     <Loading v-if="this.userData === null" loadingComponentChoice="Dots" />
-    <v-card v-else class="card">
-      <div>
-        <img
-          :src="this.userData.avatar_url"
-          :alt="this.userData.name"
-          class="avatar"
-        />
-      </div>
-      <div class="user-info">
-        <h2>{{ this.userData.name }}</h2>
-        <p>{{ this.userData.bio }}</p>
-        <ul>
-          <li><strong>Followers </strong> : {{ this.userData.followers }}</li>
-          <li><strong>Following </strong> : {{ this.userData.following }}</li>
-          <li>
-            <strong>Repositories </strong> : {{ this.userData.public_repos }}
-          </li>
-        </ul>
-        <ul class="second-desc">
-          <li v-if="this.userData.twitter_username">
-            <strong>Twitter</strong> : {{ this.userData.twitter_username }}
-          </li>
-          <li v-if="this.userData.location">
-            <strong>Location</strong> : {{ this.userData.location }}
-          </li>
-        </ul>
-        <ul>
-          <!-- make date look normal -->
-          <li v-if="this.userData.created_at">
-            <strong>Created</strong> : {{ this.userData.created_at }}
-          </li>
+    <div v-else class="flex-row">
+      <div class="card">
+        <div class="flex-column no-wrap">
+          <img
+            :src="this.userData.avatar_url"
+            :alt="this.userData.name"
+            class="avatar"
+          />
           <v-btn
-            class="margin-left"
+            variant="plain"
             v-if="this.userData.blog"
             :href="this.userData.blog"
+            target="_blank"
             >Visit Blog</v-btn
           >
-        </ul>
-        <Loading v-if="this.userRepos === null" loadingComponentChoice="Dots" />
-        <div v-else class="repos">
-          <a
-            v-for="repo in this.userRepos"
-            :key="repo.id"
-            :href="repo.html_url"
-            target="_blank"
-            class="repo"
-            >{{ repo.name }}</a
-          >
         </div>
-
-        <div id="repos"></div>
+        <div class="user-info">
+          <h2>{{ this.userData.name }}</h2>
+          <p class="margin-bottom">{{ this.userData.bio }}</p>
+          <ul class="margin-bottom">
+            <li><strong>Followers </strong> : {{ this.userData.followers }}</li>
+            <li><strong>Following </strong> : {{ this.userData.following }}</li>
+            <li>
+              <strong>Repositories </strong> :
+              {{ this.userData.public_repos }}
+            </li>
+          </ul>
+          <ul class="second-desc margin-bottom">
+            <li v-if="this.userData.location">
+              <strong>Location</strong> : {{ this.userData.location }}
+            </li>
+          </ul>
+          <ul class="margin-bottom">
+            <li v-if="this.userData.created_at">
+              <strong>Created</strong> : {{ this.userData.created_at }}
+            </li>
+          </ul>
+          <Loading
+            v-if="this.userRepos === null"
+            loadingComponentChoice="Dots"
+          />
+          <v-chip-group v-else class="flex-row">
+            <v-chip
+              v-for="repo in this.userRepos"
+              :key="repo.id"
+              :href="repo.html_url"
+              target="_blank"
+              >{{ repo.name }}</v-chip
+            >
+          </v-chip-group>
+        </div>
+        <div class="external-buttons-column margin-right-auto">
+          <v-btn
+            variant="plain"
+            icon="mdi-github"
+            class="card-external-buttons"
+            v-if="this.userData.html_url"
+            :href="this.userData.html_url"
+            target="_blank"
+          ></v-btn>
+          <v-btn
+            variant="plain"
+            icon="mdi-chart-donut"
+            class="card-external-buttons"
+            target="_blank"
+            @click="openPieChartModal"
+          ></v-btn>
+          <v-btn
+            variant="plain"
+            icon="mdi-chart-bar"
+            class="card-external-buttons"
+            target="_blank"
+          ></v-btn>
+          <v-btn
+            variant="plain"
+            icon="mdi-twitter"
+            class="card-external-buttons"
+            v-if="this.userData.twitter_username"
+            :href="'https://twitter.com/' + this.userData.twitter_username"
+            target="_blank"
+          ></v-btn>
+        </div>
       </div>
-    </v-card>
+    </div>
   </v-responsive>
+  <PieChartModal
+    v-if="this.pieChartModalOpen"
+    :username="this.username"
+    :reload-watcher="this.reloadWatcher"
+    ref="pieChartModal"
+  />
 </template>
 
 <script>
+import PieChartModal from "../modals/PieChartModal.vue";
 import Loading from "./Loading.vue";
 import moment from "moment";
 
@@ -65,6 +103,7 @@ export default {
   name: "user-component",
   components: {
     Loading,
+    PieChartModal,
   },
   props: {
     username: {
@@ -77,7 +116,7 @@ export default {
     },
   },
   data: function () {
-    return { userData: null, userRepos: null };
+    return { userData: null, userRepos: null, pieChartModalOpen: false };
   },
   mounted() {
     console.log("mounted");
@@ -131,6 +170,19 @@ export default {
         console.error("Error fetching data:", error);
       }
     },
+    scrollToPieChartModal() {
+      this.$refs.pieChartModal.$el.scrollIntoView({ behavior: "smooth" });
+    },
+    openPieChartModal() {
+      this.pieChartModalOpen = !this.pieChartModalOpen;
+
+      // Scroll to PieChartModal when opening
+      if (this.pieChartModalOpen) {
+        this.$nextTick(() => {
+          this.scrollToPieChartModal();
+        });
+      }
+    },
   },
   watch: {
     reloadWatcher() {
@@ -147,21 +199,20 @@ export default {
   box-sizing: border-box;
 }
 .card {
-  max-width: 800px;
+  max-width: min(85vw, 800px);
   background-color: gainsboro;
   color: #000;
-  border-radius: 20px;
+  border-radius: 30px;
   box-shadow: 0 5px 10px rgba(154, 160, 185, 0.05),
     0 15px 40px rgba(0, 0, 0, 0.1);
   display: flex;
   padding: 3rem;
   font-size: 16px;
-  margin: auto;
-  margin-top: 20px;
+  margin: 20px auto;
 }
 
 .avatar {
-  border-radius: 10%;
+  border-radius: 20%;
   border: 10px solid #2a2a72;
   height: 150px;
   width: 150px;
@@ -218,6 +269,45 @@ export default {
   margin-left: 1rem;
 }
 
+.margin-bottom {
+  margin-bottom: 0.3rem;
+}
+
+.margin-right-auto {
+  margin-right: auto;
+}
+
+.external-buttons-column {
+  position: relative;
+  top: -40px;
+  right: -115px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: 0px 15px;
+  color: white;
+}
+.card-external-buttons {
+  margin-right: auto;
+  margin-bottom: 10px;
+}
+
+.flex-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.no-wrap {
+  flex-wrap: nowrap;
+}
+
 @media (max-width: 768px) {
   .card {
     flex-direction: column;
@@ -231,6 +321,14 @@ export default {
 
   .user-form {
     max-width: 400px;
+  }
+  .external-buttons-column {
+    flex-direction: row;
+    color: black;
+    margin-top: 30px;
+    display: inline-block;
+    top: 0;
+    right: 0;
   }
 }
 

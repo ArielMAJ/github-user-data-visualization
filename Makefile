@@ -22,10 +22,10 @@ install:
 pre-commit:
 	$(MAKE_API) pre-commit
 
-patch: pre-commit
+patch:
 	$(MAKE_API) patch
 	$(MAKE_VUE_FRONT) patch
 
-minor: pre-commit
+minor:
 	$(MAKE_API) minor
 	$(MAKE_VUE_FRONT) minor
